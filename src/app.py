@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[12]:
+# In[1]:
 
 
 import pandas as pd
@@ -10,19 +10,19 @@ import plotly.express as px
 df = pd.read_csv('spotify-2023.csv', encoding='latin-1' ) 
 
 
-# In[13]:
+# In[2]:
 
 
 df
 
 
-# In[14]:
+# In[3]:
 
 
 df.columns
 
 
-# In[15]:
+# In[4]:
 
 
 # Convert "streams" column to numeric (if it's not already numeric)
@@ -35,7 +35,7 @@ mean_streams = df[df.streams != df.streams.max()]['streams'].mean()
 df['streams'].replace(df.streams.max(), mean_streams, inplace=True)
 
 
-# In[16]:
+# In[5]:
 
 
 # df['streams_M'] = pd.to_numeric(df['streams'], errors='coerce')
@@ -43,7 +43,7 @@ df['streams_M'] = df['streams'] / 1000000
 df['streams_M'] = df['streams_M'].round(3)
 
 
-# In[17]:
+# In[6]:
 
 
 # Sort the DataFrame by the 'values' column in descending order
@@ -53,32 +53,32 @@ df_sorted = df.sort_values(by='streams', ascending=False)
 top_10_df = df_sorted.head(10)
 
 
-# In[18]:
+# In[7]:
 
 
 top_10_df = top_10_df.sort_values(by='streams', ascending=False)
 top_10_df
 
 
-# In[19]:
+# In[8]:
 
 
 # top_10_df.loc[891, 'track_name'] = 'Come Back Home'
 
 
-# In[20]:
+# In[9]:
 
 
 top_10_df.loc[41, 'track_name'] = 'Sunflower - Spider-Man'
 
 
-# In[21]:
+# In[10]:
 
 
 top_10_df.head(10)
 
 
-# In[22]:
+# In[11]:
 
 
 # Group by 'released_year' and 'track_name' and count the number of occurrences of each combination
@@ -108,19 +108,19 @@ fig2.update_traces(line_color='#358455')
 fig2.show()
 
 
-# In[23]:
+# In[12]:
 
 
 ranked_songs = top_10_df.sort_values(by="streams", ascending=False)
 
 
-# In[24]:
+# In[13]:
 
 
 ranked_songs
 
 
-# In[25]:
+# In[14]:
 
 
 fig = px.bar(ranked_songs, x='track_name', y='streams', opacity=0.5, color_discrete_sequence=['#65BA87'])
@@ -147,7 +147,7 @@ fig.update_layout(
 fig.show()
 
 
-# In[26]:
+# In[15]:
 
 
 # Step 1: Aggregate Streams by Artist
@@ -186,7 +186,7 @@ fig3.update_layout(
 fig3.show()
 
 
-# In[30]:
+# In[17]:
 
 
 import dash
@@ -195,7 +195,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State # Import Input and Output
 
 # Load the Spotify data
-similarity_df = pd.read_csv(r'Desktop\similarity_df.csv', encoding='ISO-8859-1')
+similarity_df = pd.read_csv(r'similarity_df.csv', encoding='ISO-8859-1')
 
 similarity_df.set_index('track_name', inplace=True)
 
@@ -887,4 +887,16 @@ if __name__ == '__main__':
     
     
     
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
