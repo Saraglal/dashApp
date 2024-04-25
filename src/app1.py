@@ -1,201 +1,17 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[12]:
-
-
-import pandas as pd
-import plotly.express as px
-
-df = pd.read_csv('spotify-2023.csv', encoding='latin-1' ) 
-
-
-# In[13]:
-
-
-df
-
-
-# In[14]:
-
-
-df.columns
-
-
-# In[15]:
-
-
-# Convert "streams" column to numeric (if it's not already numeric)
-df['streams'] = pd.to_numeric(df['streams'], errors='coerce')
-
-# Calculate the mean excluding the specified value
-mean_streams = df[df.streams != df.streams.max()]['streams'].mean()
-
-# Fill the specified value with the calculated mean
-df['streams'].replace(df.streams.max(), mean_streams, inplace=True)
-
-
-# In[16]:
-
-
-# df['streams_M'] = pd.to_numeric(df['streams'], errors='coerce')
-df['streams_M'] = df['streams'] / 1000000
-df['streams_M'] = df['streams_M'].round(3)
-
-
-# In[17]:
-
-
-# Sort the DataFrame by the 'values' column in descending order
-df_sorted = df.sort_values(by='streams', ascending=False)
-
-# Selecting only the top 10 rows based on the 'values' column
-top_10_df = df_sorted.head(10)
-
-
-# In[18]:
-
-
-top_10_df = top_10_df.sort_values(by='streams', ascending=False)
-top_10_df
-
-
-# In[19]:
-
-
-# top_10_df.loc[891, 'track_name'] = 'Come Back Home'
-
-
-# In[20]:
-
-
-top_10_df.loc[41, 'track_name'] = 'Sunflower - Spider-Man'
-
-
-# In[21]:
-
-
-top_10_df.head(10)
-
-
-# In[22]:
-
-
-# Group by 'released_year' and 'track_name' and count the number of occurrences of each combination
-count_df = df.groupby(['released_year']).size().reset_index(name='count')
-
-# Create a line plot using Plotly Express
-fig2 = px.line(count_df, x='released_year', y='count')
-
-fig2.update_layout(title={'text': 'Growth of Songs Over the years on Spotify', 'font': {'color': '#EAF0EC'}})
-fig2.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(75,87,80,0.1)')
-
-fig2.update_layout(
-    xaxis=dict(
-        tickfont=dict(color='#F6FFF9'),  # Color of x-axis labels
-        title=dict(text=''),  # Color of x-axis title
-    ),
-    yaxis=dict(
-        tickfont=dict(color='#F6FFF9'),  # Color of y-axis labels
-        title=dict(text=''),  # Color of y-axis title
-    ),
-    margin=dict(t=50, b=0, l=0, r=0)  # Adjust layout margins to remove blank space
-)
-
-fig2.update_traces(line_color='#358455')
-
-
-fig2.show()
-
-
-# In[23]:
-
-
-ranked_songs = top_10_df.sort_values(by="streams", ascending=False)
-
-
-# In[24]:
-
-
-ranked_songs
-
-
-# In[25]:
-
-
-fig = px.bar(ranked_songs, x='track_name', y='streams', opacity=0.5, color_discrete_sequence=['#65BA87'])
-
-fig.update_layout(title={'text': 'Top-10 Tracks', 'font': {'color': '#F6FFF9'}})
-
-fig.update_layout(plot_bgcolor='rgba(0, 0, 0, 0)', paper_bgcolor='rgba(82,154,111,0.1)')
-
-fig.update_traces(marker_line_color='black', marker_line_width=1)
-
-fig.update_layout(
-    yaxis=dict(
-        tickfont=dict(color='#F6FFF9'),  # Color of x-axis labels
-        title=dict(text=''),  # Color of x-axis title
-        range=[-1 * ranked_songs['streams'].max() * 0.01, ranked_songs['streams'].max()]  # Expand the range to include negative values
-    ),
-    xaxis=dict(
-        tickfont=dict(color='#F6FFF9'),  # Color of y-axis labels
-        title=dict(text=''),  # Color of y-axis title
-    ),
-    margin=dict(t=50, b=0, l=0, r=0)  # Adjust layout margins to remove blank space
-)
-
-fig.show()
-
-
-# In[26]:
-
-
-# Step 1: Aggregate Streams by Artist
-artist_streams = df.groupby("artist(s)_name")["streams"].sum().reset_index()
-
-# Step 2: Rank Artists by Total Streams
-ranked_artists = artist_streams.sort_values(by="streams", ascending=False)
-
-# Step 3: Select Top 10 Artists
-top_10_artists = ranked_artists.head(10)
-
-
-############################################################################################
-
-fig3 = px.bar(top_10_artists, x='artist(s)_name', y='streams', opacity=0.5, color_discrete_sequence=['#65BA87'])
-
-fig3.update_layout(title={'text': 'Top-10 Artists', 'font': {'color': '#F6FFF9'}})
-
-fig3.update_layout(plot_bgcolor='rgba(0, 0, 0, 0)', paper_bgcolor='rgba(82,154,111,0.1)')
-
-fig3.update_traces(marker_line_color='black', marker_line_width=1)
-
-fig3.update_layout(
-    yaxis=dict(
-        tickfont=dict(color='#F6FFF9'),  # Color of x-axis labels
-        title=dict(text=''),  # Color of x-axis title
-        range=[-1 * top_10_artists['streams'].max() * 0.01, top_10_artists['streams'].max()]  # Expand the range to include negative values
-    ),
-    xaxis=dict(
-        tickfont=dict(color='#F6FFF9'),  # Color of y-axis labels
-        title=dict(text=''),  # Color of y-axis title
-    ),
-    margin=dict(t=50, b=0, l=0, r=0)  # Adjust layout margins to remove blank space
-)
-
-fig3.show()
-
-
 # In[30]:
 
 
 import dash
 import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output, State # Import Input and Output
+from dash import html as html
+# import dash_html_components as html
+from dash.dependencies import Input, Output, State 
 
 # Load the Spotify data
-similarity_df = pd.read_csv(r'Desktop\similarity_df.csv', encoding='ISO-8859-1')
+similarity_df = pd.read_csv(r'similarity_df.csv', encoding='ISO-8859-1')
 
 similarity_df.set_index('track_name', inplace=True)
 
@@ -240,15 +56,6 @@ app.layout = html.Div(
                         'background-color': 'black',  # Black strip with 50% opacity
                     }
                 ),
-                html.Span('Analyze & Discover Tunes', style={'color': '#1ac877', 'position': 'absolute',
-                        'font-size': '25px',
-                        'top': '25px',
-                        'left': '600px',
-                        'width': '400px',
-                        'height': '60px',
-                         'font-family': 'Montserrat, sans-serif', 'font-weight': 'bold'
-                        }),
-                
                 html.Img(
                     src='https://upload.wikimedia.org/wikipedia/commons/2/26/Spotify_logo_with_text.svg',
                     style={
@@ -538,7 +345,7 @@ def update_report(selected_track):
              },
             children=[
                 html.Div(className="card-header", 
-                         children='Played', style={'font-size': '18px', 'padding': '-5px','font-family': 'Palatino, Palatino Linotype, serif'}),
+                         children='Played', style={'font-size': '18px', 'font-family': 'Palatino, Palatino Linotype, serif'}),
                 html.Br(),  # Use <br> tag to create a new line
                 html.Div(className="card-body", 
                          children=f"{track_info['streams_M']} M", style={'font-size': '20px'})
@@ -680,7 +487,7 @@ def update_report(selected_track):
                 )
                 ]
                 ),
-            
+        
             html.Div(
             className="card12",
             style={'background-color': 'rgba(128, 128, 128, 0)', 
@@ -728,33 +535,6 @@ def update_report(selected_track):
                 ]
                 ),
         
-             html.Div(
-            className="card7",
-            style={'background-color': 'rgba(128, 128, 128, 0.5)', 
-            'left': '1300px',
-            'height': '80px',
-            'width': '40px',
-            'position': 'absolute',  # Ensure absolute positioning
-            'top': '230px',
-            'padding': '20px',
-            'border-radius': '5px'
-             },
-            children=[
-            html.Div(
-                className="card-body",
-                style={'font-size': '18px'},  # Change font size
-                children=[
-                    html.Img(src="https://th.bing.com/th/id/R.ad1a63272d703ea59223a7dc4be82616?rik=PvL0frac85lXCQ&riu=http%3a%2f%2fassets.stickpng.com%2fthumbs%2f6297981ce01809629f11358d.png&ehk=TippCjBmKs26CVb5%2bXHK3leW1GUuJXn9T5QR2jEE8O4%3d&risl=&pid=ImgRaw&r=0", alt="Artist Image", 
-                             style={'height': '50px', 'width': '50px', 'margin-right': '0'}),  # Add the image
-                    html.Br(),  # Add a new line
-#                     html.Br(),  # Add a new line
-                    html.Span(track_info['in_deezer_charts'], style={'font-size': '30px'})  # Change font size for artist name
-                ]
-                )
-                ]
-                ),
-        
-        
                 html.Div(
             className="card10",
             style={'background-color': 'rgba(101, 98, 91, 0.5)', 
@@ -776,40 +556,8 @@ def update_report(selected_track):
                     html.Span(track_info['in_spotify_playlists'], style={'font-size': '35px'}),
                     html.Br(), 
                     ' Playlists', 
-                    html.Br(),
-                    'on ',
-                        html.Span('Spotify', style={'color': '#4ED034'})  # Make "Spotify" green
-
-                ]
-                )
-                ]
-                ),
-        
-               html.Div(
-            className="card15",
-            style={'background-color': 'rgba(101, 98, 91, 0.5)', 
-            'left': '1280px',
-            'height': '100px',
-            'width': '100px',
-            'position': 'relative',  # Ensure absolute positioning
-            'top': '-772px',
-            'padding': '20px',
-            'border-radius': '5px'
-             },
-            children=[
-            html.Div(
-                className="card-body",
-                style={'font-size': '18px'},  # Change font size
-                children=[
-                    "Ranked", 
-                    html.Br(), # Add space between "By" and artist name
-                    html.Span(track_info['in_spotify_charts'], style={'font-size': '35px'}),
-                    ' th', 
-                    html.Br(),
-                    
-                    'on ',
-                        html.Span('Spotify', style={'color': '#4ED034'})  # Make "Spotify" green
-
+                    html.Br(), 
+                    'on Spotify' # Change font size for artist name
                 ]
                 )
                 ]
@@ -822,7 +570,7 @@ def update_report(selected_track):
             'height': '30px',
             'width': '230px',
             'position': 'relative',  # Ensure absolute positioning
-            'top': '-760px',
+            'top': '-620px',
             'padding': '20px',
             'border-radius': '5px'
              },
@@ -887,4 +635,195 @@ if __name__ == '__main__':
     
     
     
+
+
+# In[12]:
+
+
+import pandas as pd
+import plotly.express as px
+
+df = pd.read_csv('spotify-2023.csv', encoding='latin-1' ) 
+
+
+# In[13]:
+
+
+df
+
+
+# In[14]:
+
+
+df.columns
+
+
+# In[15]:
+
+
+# Convert "streams" column to numeric (if it's not already numeric)
+df['streams'] = pd.to_numeric(df['streams'], errors='coerce')
+
+# Calculate the mean excluding the specified value
+mean_streams = df[df.streams != df.streams.max()]['streams'].mean()
+
+# Fill the specified value with the calculated mean
+df['streams'].replace(df.streams.max(), mean_streams, inplace=True)
+
+
+# In[16]:
+
+
+# df['streams_M'] = pd.to_numeric(df['streams'], errors='coerce')
+df['streams_M'] = df['streams'] / 1000000
+df['streams_M'] = df['streams_M'].round(3)
+
+
+# In[17]:
+
+
+# Sort the DataFrame by the 'values' column in descending order
+df_sorted = df.sort_values(by='streams', ascending=False)
+
+# Selecting only the top 10 rows based on the 'values' column
+top_10_df = df_sorted.head(10)
+
+
+# In[18]:
+
+
+top_10_df = top_10_df.sort_values(by='streams', ascending=False)
+top_10_df
+
+
+# In[19]:
+
+
+# top_10_df.loc[891, 'track_name'] = 'Come Back Home'
+
+
+# In[20]:
+
+
+top_10_df.loc[41, 'track_name'] = 'Sunflower - Spider-Man'
+
+
+# In[21]:
+
+
+top_10_df.head(10)
+
+
+# In[22]:
+
+
+# Group by 'released_year' and 'track_name' and count the number of occurrences of each combination
+count_df = df.groupby(['released_year']).size().reset_index(name='count')
+
+# Create a line plot using Plotly Express
+fig2 = px.line(count_df, x='released_year', y='count')
+
+fig2.update_layout(title={'text': 'Growth of Songs Over the years on Spotify', 'font': {'color': '#EAF0EC'}})
+fig2.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(75,87,80,0.1)')
+
+fig2.update_layout(
+    xaxis=dict(
+        tickfont=dict(color='#F6FFF9'),  # Color of x-axis labels
+        title=dict(text=''),  # Color of x-axis title
+    ),
+    yaxis=dict(
+        tickfont=dict(color='#F6FFF9'),  # Color of y-axis labels
+        title=dict(text=''),  # Color of y-axis title
+    ),
+    margin=dict(t=50, b=0, l=0, r=0)  # Adjust layout margins to remove blank space
+)
+
+fig2.update_traces(line_color='#358455')
+
+
+fig2.show()
+
+
+# In[23]:
+
+
+ranked_songs = top_10_df.sort_values(by="streams", ascending=False)
+
+
+# In[24]:
+
+
+ranked_songs
+
+
+# In[25]:
+
+
+fig = px.bar(ranked_songs, x='track_name', y='streams', opacity=0.5, color_discrete_sequence=['#65BA87'])
+
+fig.update_layout(title={'text': 'Top-10 Tracks', 'font': {'color': '#F6FFF9'}})
+
+fig.update_layout(plot_bgcolor='rgba(0, 0, 0, 0)', paper_bgcolor='rgba(82,154,111,0.1)')
+
+fig.update_traces(marker_line_color='black', marker_line_width=1)
+
+fig.update_layout(
+    yaxis=dict(
+        tickfont=dict(color='#F6FFF9'),  # Color of x-axis labels
+        title=dict(text=''),  # Color of x-axis title
+        range=[-1 * ranked_songs['streams'].max() * 0.01, ranked_songs['streams'].max()]  # Expand the range to include negative values
+    ),
+    xaxis=dict(
+        tickfont=dict(color='#F6FFF9'),  # Color of y-axis labels
+        title=dict(text=''),  # Color of y-axis title
+    ),
+    margin=dict(t=50, b=0, l=0, r=0)  # Adjust layout margins to remove blank space
+)
+
+fig.show()
+
+
+# In[26]:
+
+
+# Step 1: Aggregate Streams by Artist
+artist_streams = df.groupby("artist(s)_name")["streams"].sum().reset_index()
+
+# Step 2: Rank Artists by Total Streams
+ranked_artists = artist_streams.sort_values(by="streams", ascending=False)
+
+# Step 3: Select Top 10 Artists
+top_10_artists = ranked_artists.head(10)
+
+
+############################################################################################
+
+fig3 = px.bar(top_10_artists, x='artist(s)_name', y='streams', opacity=0.5, color_discrete_sequence=['#65BA87'])
+
+fig3.update_layout(title={'text': 'Top-10 Artists', 'font': {'color': '#F6FFF9'}})
+
+fig3.update_layout(plot_bgcolor='rgba(0, 0, 0, 0)', paper_bgcolor='rgba(82,154,111,0.1)')
+
+fig3.update_traces(marker_line_color='black', marker_line_width=1)
+
+fig3.update_layout(
+    yaxis=dict(
+        tickfont=dict(color='#F6FFF9'),  # Color of x-axis labels
+        title=dict(text=''),  # Color of x-axis title
+        range=[-1 * top_10_artists['streams'].max() * 0.01, top_10_artists['streams'].max()]  # Expand the range to include negative values
+    ),
+    xaxis=dict(
+        tickfont=dict(color='#F6FFF9'),  # Color of y-axis labels
+        title=dict(text=''),  # Color of y-axis title
+    ),
+    margin=dict(t=50, b=0, l=0, r=0)  # Adjust layout margins to remove blank space
+)
+
+fig3.show()
+
+
+# In[ ]:
+
+
+
 
