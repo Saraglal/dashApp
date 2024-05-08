@@ -1,6 +1,6 @@
 # Spotify Analysis Dashboard
 
-This project consists of a dashboard that visualizes Spotify data using Plotly and Dash. It provides insights into the growth of songs over the years, the top 10 tracks based on their streaming numbers and song recommendations based on similarity.
+This project consists of a dashboard that visualizes Spotify data using Plotly and Dash. It provides insights into the growth of songs over the years, the top 10 tracks based on their streaming numbers and song recommendations based on similarity, deployed on Render.
 
 ## Features
 
